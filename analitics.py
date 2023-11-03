@@ -3,7 +3,6 @@ import pandas as pd
 import plotly.express as px
 from datetime import datetime
 
-st.set_option('browser.gatherUsageStats', False)
 @st.cache_resource
 def load_data():
     df = pd.read_csv('data/histograma_valores.csv')
@@ -36,12 +35,7 @@ def filter_data(df, ano_inicial):
 
 df_filtered_hist = filter_data(df, ano_inicial)
 
-# Crie um histograma da coluna "Ano" usando Plotly Express para as datas filtradas
-fig = px.bar(df_filtered_hist, x='Ano', y='Quantidade', title=f'Histograma das Datas de Distribuição ({ano_inicial} até Hoje)')
-fig.update_xaxes(title_text='Ano')
-fig.update_yaxes(title_text='Frequência')
-st.plotly_chart(fig)
-
+st.bar_chart(df_filtered_hist.set_index('Ano'))
 
 st.markdown(
     """
