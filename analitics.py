@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 from datetime import datetime
 
+st.set_option('browser.gatherUsageStats', False)
 @st.cache_resource
 def load_data():
     df = pd.read_csv('data/histograma_valores.csv')
@@ -119,7 +120,7 @@ data_2 = {
 }
 
 data_geral = {
-    'Geral':['Primeiro grau','Recursos','Sem processo'],
+    'Geral':['Primeiro grau','Recursos grau 2 e 21','Sem processo e processo com senha'],
     'Quantidade':[quantidade_grau_1, quantidade_grau_2+quantidade_grau_21, sem_processo+quantidade_p_senha]
 }
 
