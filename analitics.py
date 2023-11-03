@@ -49,8 +49,6 @@ st.markdown(
 """
 )
 
-st.write('**Preparando as tabelas com contagens de processo e recursos**')
-
 
 @st.cache_resource
 def indicadores_qte():
@@ -87,7 +85,8 @@ quantidade_grau_21_sem_recurso = indicadores.get('Quantidade Grau 21 sem recurso
 quantidade_grau_1_0000 = indicadores.get('Quantidade com 0000 (Grau 1)', 0)
 quantidade_grau_2_0000 = indicadores.get('Quantidade com 0000 (Grau 2)', 0)
 quantidade_grau_21_0000 = indicadores.get('Quantidade com 0000 (Grau 21)', 0)
-
+recurso =(quantidade_grau_2 + quantidade_grau_21)
+sem_extracao = sem_processo+quantidade_p_senha
 total = quantidade_grau_1 + quantidade_grau_2 + quantidade_grau_21 + quantidade_p_senha + sem_processo
 
 st.text(f'As demandas repetivas tem atualmente cerca de {total} observações')
@@ -116,8 +115,9 @@ data_2 = {
 
 data_geral = {
     'Geral':['Primeiro grau','Recursos','Sem processo e processo com senha'],
-    'Quantidade':[quantidade_grau_1, quantidade_grau_2+quantidade_grau_21, sem_processo+quantidade_p_senha]
+    'Quantidade':[quantidade_grau_1, recurso, sem_extracao]
 }
+
 
 df_senha = pd.DataFrame(data_senha)
 df_0000 = pd.DataFrame(data_0000)
@@ -126,10 +126,33 @@ df_cat_2 = pd.DataFrame(data_2)
 df_info_pie = pd.DataFrame(data_geral)
 
 
-st.table(df_senha)
-st.table(df_0000)
-st.table(df_cat_1)
-st.table(df_cat_2)
-st.table(df_info_pie)
+st.header('"Primeiro Grau" (Processos Sobrestados):')
+st.markdown("""
+O termo "Primeiro Grau" nesta análise refere-se a processos judiciais que estão temporariamente suspensos ou sobrestados por uma razão específica.
+Processos sobrestados podem estar aguardando a conclusão de ações relacionadas (STF), como processos em outros tribunais ou instâncias.
+A suspensão temporária é muitas vezes uma prática comum para permitir que questões específicas sejam resolvidas ou desenvolvam-se antes que o processo continue.
+A análise desses casos pode fornecer insights sobre a complexidade do sistema judicial e a gestão de processos em várias fases.
+""")
 
+Proporcao_1 = round((quantidade_grau_1 / total) * 100)
+st.write(f'Em nosso estudo cerca de a proporção da categoria "Primeiro Grau" em relação ao total é {Proporcao_1}%.')
+st.write('Esses números se referem a processos no grau 1, categorizados como "com recurso" ou "sem recurso". O total representa o número total de processos no grau 1.')
+st.table(df_cat_1)
+
+Proporcao_2 = round((recurso / total) * 100)
+st.write(f'A proporção de recursos de grau 2 referente ao "Primeiro Grau" é de {Proporcao_2}%.')
+st.write('Esses números representam processos nos graus 2 e 21, classificados com base na presença ou ausência de "primeiro grau" e na presença ou ausência de "recurso".')
+st.table(df_cat_2)
+
+Proporcao_3 = round((sem_extracao/total) * 100)
+st.write(f'A proporção de processos que não foi possivel extrai ou protegido de grau 2 referente ao "Primeiro Grau" é de {Proporcao_3}%.')
+st.write('Esses números indicam a quantidade de processos que estão protegidos por senhas e a quantidade de processos sem informações disponíveis nos graus 1 e 2.')
+st.table(df_senha)
+
+st.write('Esses números indicam a quantidade de processos que tem o final de seu npu "0000" em diferentes graus. Exemplo: xxxxxxx-dd.yyyy.8.26.0000')
+st.table(df_0000)
+
+st.write('Esses números fornecem uma visão geral dos processos no primeiro grau, processos de recurso e a quantidade de processos sem informações disponíveis ou protegidos por senha.')
+st.table(df_info_pie)
+st.write(f'Assim temos as seguintes proporções {Proporcao_1}% para o primeiro grau {Proporcao_2}% de recursos e {Proporcao_3}% para processo que estavam ou protegidos ou com algum tipo de bloqueio')
 st.bar_chart(df_info_pie.set_index('Geral'))
