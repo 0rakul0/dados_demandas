@@ -11,7 +11,6 @@ df = load_data()
 
 st.title("Análise de Demandas Repetitivas ao Longo do Tempo")
 
-st.text(f'As demandas repetivas tem atualmente cerca de {df.shape[0]} observações')
 
 st.header('Introdução:')
 
@@ -89,6 +88,9 @@ quantidade_grau_1_0000 = indicadores.get('Quantidade com 0000 (Grau 1)', 0)
 quantidade_grau_2_0000 = indicadores.get('Quantidade com 0000 (Grau 2)', 0)
 quantidade_grau_21_0000 = indicadores.get('Quantidade com 0000 (Grau 21)', 0)
 
+total = quantidade_grau_1 + quantidade_grau_2 + quantidade_grau_21 + quantidade_p_senha + sem_processo
+
+st.text(f'As demandas repetivas tem atualmente cerca de {total} observações')
 
 data_senha = {
     'Sem Processos': ['quantidade de processos com senha', 'processos consultados sem processos grau 1','processos consultados sem processos grau 2','processos consultados sem processos grau 21', 'Total Sem Processo ou com senha'],
@@ -113,7 +115,7 @@ data_2 = {
 }
 
 data_geral = {
-    'Geral':['Primeiro grau','Recursos grau 2 e 21','Sem processo e processo com senha'],
+    'Geral':['Primeiro grau','Recursos','Sem processo e processo com senha'],
     'Quantidade':[quantidade_grau_1, quantidade_grau_2+quantidade_grau_21, sem_processo+quantidade_p_senha]
 }
 
@@ -130,5 +132,4 @@ st.table(df_cat_1)
 st.table(df_cat_2)
 st.table(df_info_pie)
 
-
-
+st.bar_chart(df_info_pie.set_index('Geral'))
