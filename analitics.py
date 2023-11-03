@@ -5,19 +5,9 @@ from datetime import datetime
 
 @st.cache_resource
 def load_data():
-    df = pd.read_csv('data/base_analise_completa.csv')
-
-    mask = df['npu'].str.contains("0000000000000INATIVA|0000000000000EMGERAL")
-
-    df = df.drop(df[mask].index)
-
-    df.to_csv('data/base_analise_completa.csv', index=False)
-
-    df['distribuido'] = pd.to_datetime(df['distribuido'])
-    df['baixado'] = pd.to_datetime(df['baixado'])
+    df = pd.read_csv('data/histograma_valores.csv')
     return df
 
-# Carregue os dados usando a função de cache
 df = load_data()
 
 st.title("Análise de Demandas Repetitivas ao Longo do Tempo")
@@ -36,20 +26,21 @@ st.write("Ao explorar esses padrões, esperamos fornecer uma compreensão mais p
 
 # Defina o valor inicial do controle deslizante
 ano_inicial = st.slider('Selecione o ano inicial', 1950, datetime.today().year, 1950)
+
 @st.cache_resource
 def filter_data(df, ano_inicial):
-    limite_inferior = datetime(ano_inicial, 1, 1)
-    limite_superior = datetime.today()
-    return df[(df['distribuido'] >= limite_inferior) & (df['distribuido'] <= limite_superior)]
+    limite_inferior = ano_inicial
+    limite_superior = datetime.today().year
+    return df[(df['Ano'] >= limite_inferior) & (df['Ano'] <= limite_superior)]
 
-# Crie um DataFrame filtrado com base no ano escolhido usando a função de cache
 df_filtered_hist = filter_data(df, ano_inicial)
 
-# Crie um histograma da coluna "distribuido" usando Plotly Express para as datas filtradas
-fig = px.histogram(df_filtered_hist, x='distribuido', title=f'Histograma das Datas de Distribuição ({ano_inicial} até Hoje)', nbins=220)
-fig.update_xaxes(title_text='Data de Distribuição')
+# Crie um histograma da coluna "Ano" usando Plotly Express para as datas filtradas
+fig = px.bar(df_filtered_hist, x='Ano', y='Quantidade', title=f'Histograma das Datas de Distribuição ({ano_inicial} até Hoje)')
+fig.update_xaxes(title_text='Ano')
 fig.update_yaxes(title_text='Frequência')
 st.plotly_chart(fig)
+
 
 st.markdown(
     """
@@ -67,21 +58,25 @@ st.markdown(
 
 st.write('**Preparando as tabelas com contagens de processo e recursos**')
 
-quantidade_p_senha = (df['senha'] == True).sum()
-sem_processo = (df['tentativa_de_baixar'].notnull()).sum()
-sem_processo_1 = len(df[(df['grau'] == 1) & df['tentativa_de_baixar'].notna()])
-sem_processo_2 = len(df[(df['grau'] == 2) & df['tentativa_de_baixar'].notna()])
-sem_processo_21 = len(df[(df['grau'] == 21) & df['tentativa_de_baixar'].notna()])
-quantidade_grau_1 = len(df[df['grau'] == 1]) - sem_processo_1
-quantidade_grau_1_com_recurso = df['processo_primeiro_grau_id'].nunique()
-quantidade_grau_1_sem_recurso = quantidade_grau_1 - quantidade_grau_1_com_recurso
-quantidade_grau_2_com_primeiro = df[(df['grau'] == 2) & df['processo_primeiro_grau_id'].notnull()].shape[0]
-quantidade_grau_2_sem_primeiro = len(df[(df['grau'] == 2) & df['processo_primeiro_grau_id'].isna() & df['processo_principal_id'].isna()])
-quantidade_grau_2 = len(df[df['grau'] == 2]) - sem_processo_2
-quantidade_grau_21 = len(df[df['grau'] == 21]) -sem_processo_21
+@st.cache_resource
+def indicadores_qte():
+    df_qte = pd.read_csv('data/indicadores.csv')
+    return df_qte
 
-# Defina a ordem desejada para as categorias
-order = ['com senha','Grau 1 sem Recurso', 'Grau 1 com Recurso', 'Grau 2 com primeiro grau ', 'Grau 2 com Subprocesso', 'Grau 2 sem primeiro grau', 'Grau 21']
+df_qte = indicadores_qte()
+
+quantidade_p_senha = df_qte[df_qte['Indicador'] == 'Quantidade com senha']['Valor'].values[0]
+sem_processo = df_qte[df_qte['Indicador'] == 'Quantidade sem processo']['Valor'].values[0]
+sem_processo_1 = df_qte[df_qte['Indicador'] == 'Quantidade sem processo (Grau 1)']['Valor'].values[0]
+sem_processo_2 = df_qte[df_qte['Indicador'] == 'Quantidade sem processo (Grau 2)']['Valor'].values[0]
+sem_processo_21 = df_qte[df_qte['Indicador'] == 'Quantidade sem processo (Grau 21)']['Valor'].values[0]
+quantidade_grau_1 = df_qte[df_qte['Indicador'] == 'Quantidade Grau 1']['Valor'].values[0]
+quantidade_grau_1_com_recurso = df_qte[df_qte['Indicador'] == 'Quantidade Grau 1 com recurso']['Valor'].values[0]
+quantidade_grau_1_sem_recurso = df_qte[df_qte['Indicador'] == 'Quantidade Grau 1 sem recurso']['Valor'].values[0]
+quantidade_grau_2_com_primeiro = df_qte[df_qte['Indicador'] == 'Quantidade Grau 2 com primeiro grau']['Valor'].values[0]
+quantidade_grau_2_sem_primeiro = df_qte[df_qte['Indicador'] == 'Quantidade Grau 2 sem primeiro grau']['Valor'].values[0]
+quantidade_grau_2 = df_qte[df_qte['Indicador'] == 'Quantidade Grau 2']['Valor'].values[0]
+quantidade_grau_21 = df_qte[df_qte['Indicador'] == 'Quantidade Grau 21']['Valor'].values[0]
 
 data_senha = {
     'Sem Processos': ['quantidade de processos com senha', 'processos consultados sem processos grau 1','processos consultados sem processos grau 2','processos consultados sem processos grau 21'],
