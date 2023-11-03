@@ -58,31 +58,52 @@ st.markdown(
 
 st.write('**Preparando as tabelas com contagens de processo e recursos**')
 
+
 @st.cache_resource
 def indicadores_qte():
     df_qte = pd.read_csv('data/indicadores.csv')
     return df_qte
 
-df_qte = indicadores_qte()
 
-quantidade_p_senha = df_qte[df_qte['Indicador'] == 'Quantidade com senha']['Valor'].values[0]
-sem_processo = df_qte[df_qte['Indicador'] == 'Quantidade sem processo']['Valor'].values[0]
-sem_processo_1 = df_qte[df_qte['Indicador'] == 'Quantidade sem processo (Grau 1)']['Valor'].values[0]
-sem_processo_2 = df_qte[df_qte['Indicador'] == 'Quantidade sem processo (Grau 2)']['Valor'].values[0]
-sem_processo_21 = df_qte[df_qte['Indicador'] == 'Quantidade sem processo (Grau 21)']['Valor'].values[0]
-quantidade_grau_1 = df_qte[df_qte['Indicador'] == 'Quantidade Grau 1']['Valor'].values[0]
-quantidade_grau_1_com_recurso = df_qte[df_qte['Indicador'] == 'Quantidade Grau 1 com recurso']['Valor'].values[0]
-quantidade_grau_1_sem_recurso = df_qte[df_qte['Indicador'] == 'Quantidade Grau 1 sem recurso']['Valor'].values[0]
-quantidade_grau_2_com_primeiro = df_qte[df_qte['Indicador'] == 'Quantidade Grau 2 com primeiro grau']['Valor'].values[0]
-quantidade_grau_2_sem_primeiro = df_qte[df_qte['Indicador'] == 'Quantidade Grau 2 sem primeiro grau']['Valor'].values[0]
-quantidade_grau_2 = df_qte[df_qte['Indicador'] == 'Quantidade Grau 2']['Valor'].values[0]
-quantidade_grau_21 = df_qte[df_qte['Indicador'] == 'Quantidade Grau 21']['Valor'].values[0]
-quantidade_grau_21_com_primeiro = df_qte[df_qte['Indicador'] == 'Quantidade Grau 21 com primeiro grau']['Valor'].values[0]
-quantidade_grau_21_sem_primeiro = df_qte[df_qte['Indicador'] == 'Quantidade Grau 21 sem primeiro grau']['Valor'].values[0]
+df_indicadores = indicadores_qte()
+
+indicadores = df_indicadores.set_index('Indicador')['Valor'].to_dict()
+
+quantidade_p_senha = indicadores.get('Quantidade com senha', 0)
+sem_processo = indicadores.get('Quantidade sem processo', 0)
+sem_processo_1 = indicadores.get('Quantidade sem processo (Grau 1)', 0)
+sem_processo_2 = indicadores.get('Quantidade sem processo (Grau 2)', 0)
+sem_processo_21 = indicadores.get('Quantidade sem processo (Grau 21)', 0)
+
+quantidade_grau_1 = indicadores.get('Quantidade Grau 1', 0)
+quantidade_grau_2 = indicadores.get('Quantidade Grau 2', 0)
+quantidade_grau_21 = indicadores.get('Quantidade Grau 21', 0)
+
+quantidade_grau_1_com_recurso = indicadores.get('Quantidade Grau 1 com recurso', 0)
+quantidade_grau_1_sem_recurso = indicadores.get('Quantidade Grau 1 sem recurso', 0)
+
+quantidade_grau_2_com_primeiro = indicadores.get('Quantidade Grau 2 com primeiro grau', 0)
+quantidade_grau_2_sem_primeiro = indicadores.get('Quantidade Grau 2 sem primeiro grau', 0)
+quantidade_grau_2_com_recurso = indicadores.get('Quantidade Grau 2 com recurso', 0)
+quantidade_grau_2_sem_recurso = indicadores.get('Quantidade Grau 2 sem recurso', 0)
+quantidade_grau_21_com_primeiro = indicadores.get('Quantidade Grau 21 com primeiro grau', 0)
+quantidade_grau_21_sem_primeiro = indicadores.get('Quantidade Grau 21 sem primeiro grau', 0)
+quantidade_grau_21_com_recurso = indicadores.get('Quantidade Grau 21 com recurso', 0)
+quantidade_grau_21_sem_recurso = indicadores.get('Quantidade Grau 21 sem recurso', 0)
+
+quantidade_grau_1_0000 = indicadores.get('Quantidade com 0000 (Grau 1)', 0)
+quantidade_grau_2_0000 = indicadores.get('Quantidade com 0000 (Grau 2)', 0)
+quantidade_grau_21_0000 = indicadores.get('Quantidade com 0000 (Grau 21)', 0)
+
 
 data_senha = {
-    'Sem Processos': ['quantidade de processos com senha', 'processos consultados sem processos grau 1','processos consultados sem processos grau 2','processos consultados sem processos grau 21'],
-    'Quantidade': [quantidade_p_senha, sem_processo_1, sem_processo_2, sem_processo_21]
+    'Sem Processos': ['quantidade de processos com senha', 'processos consultados sem processos grau 1','processos consultados sem processos grau 2','processos consultados sem processos grau 21', 'Total Sem Processo ou com senha'],
+    'Quantidade': [quantidade_p_senha, sem_processo_1, sem_processo_2, sem_processo_21, quantidade_p_senha+sem_processo]
+}
+
+data_0000 = {
+    'Processos terminados com 0000 por grau':['Quantidade com 0000 (Grau 1)','Quantidade com 0000 (Grau 2)','Quantidade com 0000 (Grau 21)'],
+    'Quantidade':[quantidade_grau_1_0000, quantidade_grau_2_0000, quantidade_grau_21_0000]
 }
 
 data_1 = {
@@ -91,22 +112,26 @@ data_1 = {
 }
 
 data_2 = {
-    'Grau 2': ['Grau 2 com primeiro grau ', 'Grau 2 com Subprocesso', 'Grau 2 sem primeiro grau','Grau 21 com primeiro grau','Grau 21 sem primeiro grau', 'Turma Recursal', 'Total'],
-    'Quantidade': [quantidade_grau_2_com_primeiro, quantidade_grau_1_sem_recurso, quantidade_grau_2_sem_primeiro,quantidade_grau_21_com_primeiro,quantidade_grau_21_sem_primeiro, quantidade_grau_21, quantidade_grau_2+quantidade_grau_21 ]
+    'Recursos': ['Quantidade Grau 2 com primeiro grau','Quantidade Grau 2 sem primeiro grau','Quantidade Grau 2 com recurso','Quantidade Grau 2 sem recurso',
+                 'Quantidade Grau 21 com primeiro grau','Quantidade Grau 21 sem primeiro grau','Quantidade Grau 21 com recurso','Quantidade Grau 21 sem recurso'],
+    'Quantidade': [quantidade_grau_2_com_primeiro,quantidade_grau_2_sem_primeiro,quantidade_grau_2_com_recurso,quantidade_grau_2_sem_recurso,
+                   quantidade_grau_21_com_primeiro,quantidade_grau_21_sem_primeiro,quantidade_grau_21_com_recurso,quantidade_grau_21_sem_recurso]
 }
 
 data_geral = {
-    'Geral':['primeiro grau','recurso','sem processo'],
-    'Quantidade':[quantidade_grau_1, quantidade_grau_2+quantidade_grau_21, sem_processo]
+    'Geral':['Primeiro grau','Recursos','Sem processo'],
+    'Quantidade':[quantidade_grau_1, quantidade_grau_2+quantidade_grau_21, sem_processo+quantidade_p_senha]
 }
 
 df_senha = pd.DataFrame(data_senha)
+df_0000 = pd.DataFrame(data_0000)
 df_cat_1 = pd.DataFrame(data_1)
 df_cat_2 = pd.DataFrame(data_2)
 df_info_pie = pd.DataFrame(data_geral)
 
 
 st.table(df_senha)
+st.table(df_0000)
 st.table(df_cat_1)
 st.table(df_cat_2)
 st.table(df_info_pie)
