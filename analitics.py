@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 from datetime import datetime
 
 @st.cache_resource
@@ -131,9 +130,5 @@ st.table(df_cat_1)
 st.table(df_cat_2)
 st.table(df_info_pie)
 
-fig_qte_grau = px.pie(df_info_pie, names='Geral', values='Quantidade', title='Distribuição dos processos por Grau',
-             labels={'Geral': 'Geral', 'Quantidade': 'Quantidade'})
-
-st.plotly_chart(fig_qte_grau)
 
 
