@@ -38,6 +38,8 @@ quantidade_grau_1_com_recurso = df['processo_primeiro_grau_id'].nunique()
 quantidade_grau_1_sem_recurso = quantidade_grau_1 - quantidade_grau_1_com_recurso
 quantidade_grau_2_com_primeiro = df[(df['grau'] == 2) & df['processo_primeiro_grau_id'].notnull()].shape[0]
 quantidade_grau_2_sem_primeiro = len(df[(df['grau'] == 2) & df['processo_primeiro_grau_id'].isna() & df['processo_principal_id'].isna()])
+quantidade_grau_21_com_primeiro = df[(df['grau'] == 21) & df['processo_primeiro_grau_id'].notnull()].shape[0]
+quantidade_grau_21_sem_primeiro = len(df[(df['grau'] == 21) & df['processo_primeiro_grau_id'].isna() & df['processo_principal_id'].isna()])
 quantidade_grau_2 = len(df[df['grau'] == 2]) - sem_processo_2
 quantidade_grau_21 = len(df[df['grau'] == 21]) -sem_processo_21
 
@@ -47,13 +49,13 @@ data = {
         'Quantidade sem processo (Grau 1)', 'Quantidade sem processo (Grau 2)', 'Quantidade sem processo (Grau 21)',
         'Quantidade Grau 1', 'Quantidade Grau 1 com recurso', 'Quantidade Grau 1 sem recurso',
         'Quantidade Grau 2 com primeiro grau', 'Quantidade Grau 2 sem primeiro grau', 'Quantidade Grau 2',
-        'Quantidade Grau 21'
+        'Quantidade Grau 21','Quantidade Grau 21 com primeiro grau como recurso', 'Quantidade Grau 21 sem primeiro grau como recurso'
     ],
     'Valor': [
         quantidade_p_senha, sem_processo, sem_processo_1, sem_processo_2, sem_processo_21,
         quantidade_grau_1, quantidade_grau_1_com_recurso, quantidade_grau_1_sem_recurso,
         quantidade_grau_2_com_primeiro, quantidade_grau_2_sem_primeiro, quantidade_grau_2,
-        quantidade_grau_21
+        quantidade_grau_21,quantidade_grau_21_com_primeiro, quantidade_grau_21_sem_primeiro
     ]
 }
 

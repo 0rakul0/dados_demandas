@@ -77,6 +77,8 @@ quantidade_grau_2_com_primeiro = df_qte[df_qte['Indicador'] == 'Quantidade Grau 
 quantidade_grau_2_sem_primeiro = df_qte[df_qte['Indicador'] == 'Quantidade Grau 2 sem primeiro grau']['Valor'].values[0]
 quantidade_grau_2 = df_qte[df_qte['Indicador'] == 'Quantidade Grau 2']['Valor'].values[0]
 quantidade_grau_21 = df_qte[df_qte['Indicador'] == 'Quantidade Grau 21']['Valor'].values[0]
+quantidade_grau_21_com_primeiro = df_qte[df_qte['Indicador'] == 'Quantidade Grau 21 com primeiro grau']['Valor'].values[0]
+quantidade_grau_21_sem_primeiro = df_qte[df_qte['Indicador'] == 'Quantidade Grau 21 sem primeiro grau']['Valor'].values[0]
 
 data_senha = {
     'Sem Processos': ['quantidade de processos com senha', 'processos consultados sem processos grau 1','processos consultados sem processos grau 2','processos consultados sem processos grau 21'],
@@ -89,8 +91,8 @@ data_1 = {
 }
 
 data_2 = {
-    'Grau 2': ['Grau 2 com primeiro grau ', 'Grau 2 com Subprocesso', 'Grau 2 sem primeiro grau', 'Turma Recursal', 'Total'],
-    'Quantidade': [quantidade_grau_2_com_primeiro, quantidade_grau_1_sem_recurso, quantidade_grau_2_sem_primeiro, quantidade_grau_21, quantidade_grau_2+quantidade_grau_21 ]
+    'Grau 2': ['Grau 2 com primeiro grau ', 'Grau 2 com Subprocesso', 'Grau 2 sem primeiro grau','Grau 21 com primeiro grau','Grau 21 sem primeiro grau', 'Turma Recursal', 'Total'],
+    'Quantidade': [quantidade_grau_2_com_primeiro, quantidade_grau_1_sem_recurso, quantidade_grau_2_sem_primeiro,quantidade_grau_21_com_primeiro,quantidade_grau_21_sem_primeiro, quantidade_grau_21, quantidade_grau_2+quantidade_grau_21 ]
 }
 
 data_geral = {
@@ -102,6 +104,7 @@ df_senha = pd.DataFrame(data_senha)
 df_cat_1 = pd.DataFrame(data_1)
 df_cat_2 = pd.DataFrame(data_2)
 df_info_pie = pd.DataFrame(data_geral)
+
 
 st.table(df_senha)
 st.table(df_cat_1)
