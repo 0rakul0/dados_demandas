@@ -37,7 +37,7 @@ st.bar_chart(df_filtered_hist.set_index('Ano'))
 
 st.markdown(
     """
-## objetivo da analise
+## Objetivo da analise
 
 1. **Preparar tabelas com contagens de processo e recursos**: Criar tabelas que incluam contagens de processos e recursos. Isso pode exigir a extração de dados de algum sistema ou banco de dados.
 
@@ -85,15 +85,16 @@ quantidade_grau_21_sem_recurso = indicadores.get('Quantidade Grau 21 sem recurso
 quantidade_grau_1_0000 = indicadores.get('Quantidade com 0000 (Grau 1)', 0)
 quantidade_grau_2_0000 = indicadores.get('Quantidade com 0000 (Grau 2)', 0)
 quantidade_grau_21_0000 = indicadores.get('Quantidade com 0000 (Grau 21)', 0)
-recurso =(quantidade_grau_2 + quantidade_grau_21)
-sem_extracao = sem_processo+quantidade_p_senha
+
+recurso =quantidade_grau_2 + quantidade_grau_21
+sem_extracao = sem_processo + quantidade_p_senha
 total = quantidade_grau_1 + quantidade_grau_2 + quantidade_grau_21 + quantidade_p_senha + sem_processo
 
 st.text(f'As demandas repetivas tem atualmente cerca de {total} observações')
 
 data_senha = {
     'Sem Processos': ['quantidade de processos com senha', 'processos consultados sem processos grau 1','processos consultados sem processos grau 2','processos consultados sem processos grau 21', 'Total Sem Processo ou com senha'],
-    'Quantidade': [quantidade_p_senha, sem_processo_1, sem_processo_2, sem_processo_21, quantidade_p_senha+sem_processo]
+    'Quantidade': [quantidade_p_senha, sem_processo_1, sem_processo_2, sem_processo_21, sem_extracao]
 }
 
 data_0000 = {
@@ -126,7 +127,7 @@ df_cat_2 = pd.DataFrame(data_2)
 df_info_pie = pd.DataFrame(data_geral)
 
 
-st.header('"Primeiro Grau" (Processos Sobrestados):')
+st.subheader('Primeiro Grau (Processos Sobrestados)')
 st.markdown("""
 O termo "Primeiro Grau" nesta análise refere-se a processos judiciais que estão temporariamente suspensos ou sobrestados por uma razão específica.
 Processos sobrestados podem estar aguardando a conclusão de ações relacionadas (STF), como processos em outros tribunais ou instâncias.
@@ -156,3 +157,42 @@ st.write('Esses números fornecem uma visão geral dos processos no primeiro gra
 st.table(df_info_pie)
 st.write(f'Assim temos as seguintes proporções {Proporcao_1}% para o primeiro grau {Proporcao_2}% de recursos e {Proporcao_3}% para processo que estavam ou protegidos ou com algum tipo de bloqueio')
 st.bar_chart(df_info_pie.set_index('Geral'))
+
+
+st.header('Analise dos Juizes por classe classes')
+
+st.write('O ranking foi montado usando o nome do Juiz como referencia')
+
+@st.cache_resource
+def load_classe_juiz():
+    result_df_classe = pd.read_csv('data/ranking_classe_juizes.csv')
+    return result_df_classe
+result_df_classe = load_classe_juiz()
+
+st.write('Como podemos observar o ranking varia muito com o passar dos anos assim como a quantidade de classes processuais')
+
+selected_year_classe = st.slider('Selecione o ano', min_value=1950, max_value=2023)
+filtered_df_classe = result_df_classe[result_df_classe['ano'] == selected_year_classe]
+processos_por_classe_juiz= filtered_df_classe.groupby(['nome_juiz','nome_classe']).size().reset_index(name='quantidade_processos')
+processos_por_classe_juiz = processos_por_classe_juiz.sort_values(by='quantidade_processos', ascending=False)
+top_10_classe = processos_por_classe_juiz.head(10)
+st.table(top_10_classe)
+st.bar_chart(top_10_classe.set_index('nome_juiz')['quantidade_processos'])
+
+
+processos_por_juiz = result_df_classe.groupby('nome_juiz')['p_id'].count()
+processos_por_juiz = processos_por_juiz.reset_index()
+processos_por_juiz = processos_por_juiz.rename(columns={'p_id': 'quantidade_processos'})
+processos_por_juiz = processos_por_juiz.sort_values(by='quantidade_processos', ascending=False)
+st.write('Quantidade de processos por juiz')
+processos_por_juiz = processos_por_juiz.head(10)
+st.table(processos_por_juiz)
+
+processos_por_classe = result_df_classe.groupby('nome_classe')['p_id'].count()
+processos_por_classe = processos_por_classe.reset_index()
+processos_por_classe = processos_por_classe.rename(columns={'p_id': 'quantidade_processos'})
+processos_por_classe = processos_por_classe.sort_values(by='quantidade_processos', ascending=False)
+st.write('Quantidade de processos por classe')
+processos_por_classe = processos_por_classe.head(10)
+st.table(processos_por_classe)
+
